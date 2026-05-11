@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت گیم نت</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>مدیریت گیم نت</h1>
+        <div class="header-buttons">
+            <button id="tournament-btn">🏆 برگزاری تورنومنت</button>
+            <button id="reservation-btn">➕ ثبت رزرو</button>
+            <button id="admin-panel-btn">⚙️ پنل مدیریت</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- فرم شروع بازی (در ابتدا مخفی است) -->
+        <div id="start-session-form" class="form-container hidden">
+            <h3>شروع بازی برای <span id="selected-device-name"></span></h3>
+            <input type="text" id="customer-name" placeholder="نام مشتری را وارد کنید..." required>
+
+            <div id="custom-time-container">
+                <label for="custom-time-input">زمان شروع (اختیاری):</label>
+                <input type="time" id="custom-time-input">
+            </div>
+
+            <div id="controller-selection" class="hidden">
+                <label for="controller-count">تعداد دسته:</label>
+                <select id="controller-count">
+                    <option value="2">۲ دسته (استاندارد)</option>
+                    <option value="3">۳ دسته</option>
+                    <option value="4">۴ دسته</option>
+                </select>
+            </div>
+            <div class="form-buttons">
+                <button id="start-button">شروع بازی</button>
+                <button id="cancel-button">انصراف</button>
+            </div>
+        </div>
+
+        <!-- بخش دستگاه‌ها -->
+        <div class="devices-container">
+            <div class="device-section">
+                <h3><img src="./image/playstation.png" alt="کنسول" /> کنسول‌ها</h3>
+                <div class="device-grid" id="consoles"></div>
+            </div>
+            <div class="device-section">
+                <h3><img src="./image/pc.png" alt="کامپیوتر" /> کامپیوترها</h3>
+                <div class="device-grid" id="pcs"></div>
+            </div>
+            <div class="device-section">
+                <h3><img src="./image/biliard.png" alt="بیلیارد" /> میز بیلیارد</h3>
+                <div class="device-grid" id="billiards"></div>
+            </div>
+            <div class="device-section">
+                <h3><img src="./image/vr.png" alt="VR" /> واقعیت مجازی (VR)</h3>
+                <div class="device-grid" id="vrs"></div>
+            </div>
+        </div>
+
+        <!-- بخش جلسات فعال -->
+        <div class="sessions-container">
+            <h2>لیست بازیکنان فعال</h2>
+            <table id="active-sessions-table">
+                <thead>
+                    <tr>
+                        <th class="toggle-col"></th>
+                        <th>مشتری</th>
+                        <th>تعداد بازی</th>
+                        <th>هزینه کل (تومان)</th>
+                        <th>عملیات</th>
+                    </tr>
+                </thead>
+                <tbody id="sessions-list"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- مودال پنل مدیریت -->
+    <div id="admin-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-btn">×</span>
+            <h2>پنل مدیریت</h2>
+            <div class="modal-section">
+                <h3>تنظیمات قیمت‌ها</h3>
+                <div class="settings-grid">
+                    <div><label for="rate-ps5-input">نرخ ساعتی PS5:</label><input type="number" id="rate-ps5-input">
+                    </div>
+                    <div><label for="rate-ps4-input">نرخ ساعتی PS4:</label><input type="number" id="rate-ps4-input">
+                    </div>
+                    <div><label for="rate-pc-input">نرخ ساعتی کامپیوتر:</label><input type="number" id="rate-pc-input">
+                    </div>
+                    <div><label for="rate-billiard-input">نرخ ساعتی بیلیارد:</label><input type="number"
+                            id="rate-billiard-input"></div>
+                    <div><label for="rate-vr-input">نرخ ساعتی VR:</label><input type="number" id="rate-vr-input"></div>
+                    <div><label for="extra-controller-input">هزینه هر دسته اضافه:</label><input type="number"
+                            id="extra-controller-input"></div>
+                </div>
+                <hr>
+                <h4>مدیریت محصولات</h4>
+                <div id="products-settings-container"></div>
+                <button id="add-product-btn">+ افزودن محصول جدید</button>
+                <button id="save-settings-btn">ذخیره تمام تنظیمات</button>
+            </div>
+            <hr>
+            <div class="modal-section">
+                <h3>لیست رزروهای آینده</h3>
+                <table id="reservations-table">
+                    <thead>
+                        <tr>
+                            <th>مشتری</th>
+                            <th>زمان رزرو</th>
+                            <th>دستگاه‌ها</th>
+                            <th>عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reservations-list-body"></tbody>
+                </table>
+            </div>
+            <hr>
+            <div class="modal-section">
+                <h3>تاریخچه تسویه حساب‌ها (۷ روز گذشته)</h3>
+                <div class="history-summary">
+                    <span>مجموع درآمد:</span><strong id="total-income">0 تومان</strong>
+                </div>
+                <table id="history-table">
+                    <thead>
+                        <tr>
+                            <th>مشتری</th>
+                            <th>دستگاه</th>
+                            <th>مبلغ نهایی</th>
+                            <th>تاریخ</th>
+                            <th>حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-list"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال ثبت رزرو -->
+    <div id="reservation-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-reservation-btn">×</span>
+            <h2>ثبت رزرو جدید</h2>
+            <form id="reservation-form">
+                <div class="form-group"><label for="res-customer-name">نام مشتری:</label><input type="text"
+                        id="res-customer-name" required></div>
+                <div class="form-group"><label for="res-phone-number">شماره تماس (اختیاری):</label><input type="tel"
+                        id="res-phone-number" placeholder="مثال: 09123456789"></div>
+                <div class="form-group"><label for="res-datetime">تاریخ و ساعت رزرو:</label><input type="datetime-local"
+                        id="res-datetime" required></div>
+                <div class="form-group">
+                    <h4>انتخاب دستگاه‌ها:</h4>
+                    <div id="reservation-device-list" class="reservation-grid"></div>
+                </div>
+                <button type="submit" id="confirm-reservation-btn">ثبت نهایی رزرو</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- مودال تنظیمات اولیه تورنومنت -->
+    <div id="tournament-setup-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-tournament-setup-btn">×</span>
+            <h2>راه‌اندازی تورنومنت جدید</h2>
+            <form id="tournament-setup-form">
+                <div class="form-group"><label for="tournament-name">نام تورنومنت:</label><input type="text"
+                        id="tournament-name" required></div>
+                <div class="form-group">
+                    <label for="player-count">تعداد بازیکنان:</label>
+                    <select id="player-count" class="form-control">
+                        <option value="4">۴ نفر</option>
+                        <option value="8">۸ نفر</option>
+                        <option value="16">۱۶ نفر</option>
+                        <option value="32">۳۲ نفر</option>
+                        <option value="64">۶۴ نفر</option>
+                    </select>
+                </div>
+                <button type="submit" id="init-tournament-btn">مرحله بعد</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- مودال صفحه اصلی تورنومنت -->
+    <div id="tournament-bracket-modal" class="modal hidden">
+        <div class="modal-content wide">
+            <span class="close-tournament-bracket-btn">×</span>
+            <h2 id="tournament-modal-title">تورنومنت</h2>
+            <div id="tournament-content-area"></div>
+        </div>
+    </div>
+
+    <!-- مودال افزودن بازی جدید برای مشتری موجود -->
+    <div id="add-game-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-add-game-btn">×</span>
+            <h2>افزودن بازی جدید برای <strong id="add-game-customer-name"></strong></h2>
+            <div class="form-group">
+                <h4>یک دستگاه برای شروع انتخاب کنید:</h4>
+                <div id="add-game-device-list" class="reservation-grid"></div>
+            </div>
+            <p class="error-message" id="add-game-error"></p>
+        </div>
+    </div>
+
+    <div class="promote">
+        <span>ساخته شده با ❤️ توسط طاها</span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
